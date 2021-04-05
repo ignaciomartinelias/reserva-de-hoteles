@@ -1,23 +1,95 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
+import HotelCard from "./HotelCard";
+import Navbar from "./Navbar";
+import hotelesTotales from "./data";
 
 function App() {
+  const fechaMinimaDeInicio = new Date().valueOf();
+
+  const [filtros, setFiltros] = useState({
+    fechaIngreso: fechaMinimaDeInicio,
+    fechaSalida: "",
+    pais: "",
+    precio: "",
+    tamaño: "",
+  });
+
+  const { fechaIngreso, fechaSalida, pais, precio, tamaño } = filtros;
+
+  const seleccionarFechaIngreso = evento => {
+    const timestampDeInicio = new Date(evento.target.value).valueOf();
+    setFiltros({ ...filtros, fechaIngreso: timestampDeInicio });
+  };
+
+  const seleccionarFechaSalida = evento => {
+    const timestampDeSalida = new Date(evento.target.value).valueOf();
+    setFiltros({ ...filtros, fechaSalida: timestampDeSalida });
+  };
+
+  const seleccionarPais = evento => {
+    setFiltros({ ...filtros, pais: evento.target.value });
+  };
+
+  const seleccionarPrecio = evento => {
+    const precio = parseInt(evento.target.value);
+    setFiltros({ ...filtros, precio: precio });
+  };
+
+  const seleccionarTamaño = evento => {
+    setFiltros({ ...filtros, tamaño: evento.target.value });
+  };
+
+  const filtrarHoteles = () => {
+    let habitacionesMinimas;
+    let habitacionesMaximas;
+
+    if (tamaño === "pequeño") {
+      habitacionesMinimas = 0;
+      habitacionesMaximas = 10;
+    } else if (tamaño === "mediano") {
+      habitacionesMinimas = 10;
+      habitacionesMaximas = 20;
+    } else if (tamaño === "grande") {
+      habitacionesMinimas = 20;
+    }
+
+    const hotelesFiltrados = hotelesTotales.filter(hotel => {
+      const tieneDisponibilidad =
+        (!fechaIngreso || hotel.availabilityFrom <= fechaIngreso) &&
+        (!fechaSalida || hotel.availabilityTo >= fechaSalida);
+
+      const esDelPrecioCorrespondiente = !precio || hotel.price === precio;
+      const esDelPaisCorrespondiente = !pais || hotel.country === pais;
+      const esDelTamañoCorrespondiente =
+        (!habitacionesMinimas || hotel.rooms > habitacionesMinimas) &&
+        (!habitacionesMaximas || hotel.rooms <= habitacionesMaximas);
+
+      if (tieneDisponibilidad && esDelPrecioCorrespondiente && esDelPaisCorrespondiente && esDelTamañoCorrespondiente) {
+        return hotel;
+      }
+    });
+    return hotelesFiltrados;
+  };
+
+  const hotelesFiltrados = filtrarHoteles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <Navbar
+        seleccionarFechaIngreso={seleccionarFechaIngreso}
+        seleccionarFechaSalida={seleccionarFechaSalida}
+        seleccionarPais={seleccionarPais}
+        seleccionarPrecio={seleccionarPrecio}
+        seleccionarTamaño={seleccionarTamaño}
+        filtros={filtros}
+        fechaMinimaDeInicio={fechaMinimaDeInicio}
+      />
+      <div className='container-hoteles'>
+        {hotelesFiltrados.map((hotel, index) => (
+          <HotelCard hotel={hotel} key={index} />
+        ))}
+      </div>
     </div>
   );
 }
