@@ -4,9 +4,9 @@ const Navbar = ({
   seleccionarPais,
   seleccionarPrecio,
   seleccionarTamaño,
-  fechaMinimaDeInicio,
-  filtros
+  filtros,
 }) => {
+  const fechaMinimaDeInicio = new Date().valueOf();
   const { fechaIngreso, fechaSalida, precio, tamaño, pais } = filtros;
 
   const fechaDeInicioLegible =

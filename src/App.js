@@ -5,10 +5,9 @@ import Navbar from "./Navbar";
 import hotelesTotales from "./data";
 
 function App() {
-  const fechaMinimaDeInicio = new Date().valueOf();
 
   const [filtros, setFiltros] = useState({
-    fechaIngreso: fechaMinimaDeInicio,
+    fechaIngreso: "",
     fechaSalida: "",
     pais: "",
     precio: "",
@@ -83,7 +82,6 @@ function App() {
         seleccionarPrecio={seleccionarPrecio}
         seleccionarTamaño={seleccionarTamaño}
         filtros={filtros}
-        fechaMinimaDeInicio={fechaMinimaDeInicio}
       />
       <div className='container-hoteles'>
         {hotelesFiltrados.map((hotel, index) => (
